@@ -1,128 +1,74 @@
-import { useState } from 'react'
-import {
-  LayoutDashboard, Users, Dumbbell, Calendar,
-  CreditCard, Menu, X, Dumbbell as LogoIcon
-} from 'lucide-react'
-import { Dashboard } from './pages/Dashboard'
-import { MembersPage } from './pages/MembersPage'
-import { TrainersPage } from './pages/TrainersPage'
-import { ClassesPage } from './pages/ClassesPage'
-import { SchedulesPage } from './pages/SchedulesPage'
-import { MembershipsPage } from './pages/MembershipsPage'
+import { BrowserRouter, Routes, Route, useLocation, useNavigate } from 'react-router-dom'
+import { Home, ClipboardList, Sparkles, Users } from 'lucide-react'
+import { HomePage } from './pages/HomePage'
+import { OrdersPage } from './pages/OrdersPage'
+import { OrderDetailPage } from './pages/OrderDetailPage'
+import { NewOrderPage } from './pages/NewOrderPage'
+import { ServicesPage } from './pages/ServicesPage'
+import { CustomersPage } from './pages/CustomersPage'
 
-type Page = 'dashboard' | 'members' | 'trainers' | 'classes' | 'schedules' | 'memberships'
+function BottomNav() {
+  const location = useLocation()
+  const navigate = useNavigate()
 
-const navItems: { id: Page; label: string; icon: React.ReactNode }[] = [
-  { id: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard className="w-5 h-5" /> },
-  { id: 'members', label: 'Members', icon: <Users className="w-5 h-5" /> },
-  { id: 'trainers', label: 'Trainers', icon: <Dumbbell className="w-5 h-5" /> },
-  { id: 'classes', label: 'Classes', icon: <Calendar className="w-5 h-5" /> },
-  { id: 'schedules', label: 'Schedules', icon: <Calendar className="w-5 h-5" /> },
-  { id: 'memberships', label: 'Memberships', icon: <CreditCard className="w-5 h-5" /> },
-]
+  const tabs = [
+    { id: 'home', path: '/', label: 'Beranda', icon: Home },
+    { id: 'orders', path: '/orders', label: 'Pesanan', icon: ClipboardList },
+    { id: 'services', path: '/services', label: 'Layanan', icon: Sparkles },
+    { id: 'customers', path: '/customers', label: 'Pelanggan', icon: Users },
+  ]
 
-export default function App() {
-  const [currentPage, setCurrentPage] = useState<Page>('dashboard')
-  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const currentTab = tabs.find(t => location.pathname.startsWith(t.path) || (t.path === '/' && location.pathname === '/'))?.id || 'home'
 
-  const renderPage = () => {
-    switch (currentPage) {
-      case 'dashboard':
-        return <Dashboard />
-      case 'members':
-        return <MembersPage />
-      case 'trainers':
-        return <TrainersPage />
-      case 'classes':
-        return <ClassesPage />
-      case 'schedules':
-        return <SchedulesPage />
-      case 'memberships':
-        return <MembershipsPage />
-      default:
-        return <Dashboard />
-    }
+  if (location.pathname.includes('/orders/new') || location.pathname.includes('/orders/')) {
+    return null
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Mobile sidebar overlay */}
-      {sidebarOpen && (
-        <div
-          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
-
-      {/* Sidebar */}
-      <aside
-        className={`fixed top-0 left-0 z-50 h-full w-64 bg-white border-r border-gray-200 transition-transform duration-300 ease-in-out lg:translate-x-0 ${
-          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        }`}
-      >
-        <div className="flex items-center justify-between p-4 border-b border-gray-200">
-          <div className="flex items-center gap-2">
-            <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-emerald-600">
-              <LogoIcon className="w-6 h-6 text-white" />
-            </div>
-            <span className="text-xl font-bold text-gray-900">FitPro</span>
-          </div>
-          <button
-            onClick={() => setSidebarOpen(false)}
-            className="p-2 rounded-lg hover:bg-gray-100 lg:hidden"
-          >
-            <X className="w-5 h-5 text-gray-500" />
-          </button>
-        </div>
-
-        <nav className="p-4 space-y-1">
-          {navItems.map((item) => (
+    <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50 safe-bottom">
+      <div className="flex items-center justify-around h-16 max-w-lg mx-auto">
+        {tabs.map((tab) => {
+          const Icon = tab.icon
+          const isActive = currentTab === tab.id
+          return (
             <button
-              key={item.id}
-              onClick={() => {
-                setCurrentPage(item.id)
-                setSidebarOpen(false)
-              }}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
-                currentPage === item.id
-                  ? 'bg-emerald-50 text-emerald-700'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+              key={tab.id}
+              onClick={() => navigate(tab.path)}
+              className={`flex flex-col items-center justify-center w-16 h-full transition-colors ${
+                isActive ? 'text-cyan-600' : 'text-gray-400'
               }`}
             >
-              {item.icon}
-              {item.label}
+              <Icon className={`w-6 h-6 ${isActive ? 'scale-110' : ''} transition-transform`} />
+              <span className="text-xs mt-1 font-medium">{tab.label}</span>
             </button>
-          ))}
-        </nav>
-      </aside>
-
-      {/* Main content */}
-      <div className="lg:pl-64">
-        {/* Top bar */}
-        <header className="sticky top-0 z-30 bg-white border-b border-gray-200">
-          <div className="flex items-center justify-between px-4 py-3">
-            <button
-              onClick={() => setSidebarOpen(true)}
-              className="p-2 rounded-lg hover:bg-gray-100 lg:hidden"
-            >
-              <Menu className="w-5 h-5 text-gray-500" />
-            </button>
-            <div className="flex-1 lg:hidden" />
-            <div className="flex items-center gap-4">
-              <div className="text-right hidden sm:block">
-                <p className="text-sm font-medium text-gray-900">Gym Admin</p>
-                <p className="text-xs text-gray-500">Administrator</p>
-              </div>
-              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-emerald-100 text-emerald-600 font-medium">
-                A
-              </div>
-            </div>
-          </div>
-        </header>
-
-        {/* Page content */}
-        <main className="p-4 md:p-6 lg:p-8 animate-fade-in">{renderPage()}</main>
+          )
+        })}
       </div>
+    </nav>
+  )
+}
+
+function AppContent() {
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/orders" element={<OrdersPage />} />
+        <Route path="/orders/new" element={<NewOrderPage />} />
+        <Route path="/orders/:id" element={<OrderDetailPage />} />
+        <Route path="/services" element={<ServicesPage />} />
+        <Route path="/customers" element={<CustomersPage />} />
+        <Route path="/customers/new" element={<CustomersPage />} />
+      </Routes>
+      <BottomNav />
     </div>
+  )
+}
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <AppContent />
+    </BrowserRouter>
   )
 }

@@ -10,90 +10,75 @@ if (!supabaseUrl || !supabaseAnonKey) {
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
-export type Member = {
+export type Customer = {
   id: string
   name: string
-  email: string
-  phone: string | null
-  gender: 'male' | 'female' | 'other' | null
-  birth_date: string | null
-  join_date: string
-  status: 'active' | 'inactive'
+  phone: string
+  email: string | null
+  address: string | null
+  notes: string | null
+  total_orders: number
+  total_spent: number
   created_at: string
 }
 
-export type Trainer = {
-  id: string
-  name: string
-  email: string
-  phone: string | null
-  specialty: string | null
-  experience_years: number
-  bio: string | null
-  photo_url: string | null
-  status: 'active' | 'inactive'
-  created_at: string
-}
-
-export type Membership = {
+export type Service = {
   id: string
   name: string
   description: string | null
-  price_monthly: number
-  duration_months: number
-  features: string[]
+  base_price: number
+  unit: string
+  estimated_hours: number
+  icon: string
   is_active: boolean
   created_at: string
 }
 
-export type GymClass = {
+export type Order = {
   id: string
+  order_number: string
+  customer_id: string
+  service_id: string
+  weight: number
+  quantity: number
+  notes: string | null
+  subtotal: number
+  delivery_fee: number
+  discount: number
+  total: number
+  status: 'pending' | 'processing' | 'washing' | 'drying' | 'ironing' | 'ready' | 'delivered' | 'cancelled'
+  payment_status: 'unpaid' | 'paid' | 'partial'
+  pickup_date: string | null
+  pickup_time: string | null
+  delivery_date: string | null
+  delivery_time: string | null
+  est_completion: string | null
+  created_at: string
+  customer?: Customer
+  service?: Service
+}
+
+export type OrderItem = {
+  id: string
+  order_id: string
+  item_name: string
+  quantity: number
+  price: number
+  notes: string | null
+  created_at: string
+}
+
+export type Promo = {
+  id: string
+  code: string
   name: string
-  description: string | null
-  duration_minutes: number
-  difficulty_level: 'beginner' | 'intermediate' | 'advanced' | null
-  max_capacity: number
-  trainer_id: string | null
+  discount_percent: number
+  discount_amount: number
+  min_order: number
+  max_discount: number | null
+  valid_from: string
+  valid_until: string
   is_active: boolean
+  usage_count: number
   created_at: string
-  trainer?: Trainer
-}
-
-export type ClassSchedule = {
-  id: string
-  class_id: string
-  trainer_id: string | null
-  schedule_date: string
-  start_time: string
-  end_time: string
-  room: string | null
-  capacity: number
-  enrolled_count: number
-  status: 'scheduled' | 'completed' | 'cancelled'
-  created_at: string
-  gym_class?: GymClass
-  trainer?: Trainer
-}
-
-export type Enrollment = {
-  id: string
-  member_id: string
-  schedule_id: string
-  enrolled_at: string
-  status: 'enrolled' | 'attended' | 'cancelled'
-  created_at: string
-  member?: Member
-  schedule?: ClassSchedule
-}
-
-export type MemberMembership = {
-  id: string
-  member_id: string
-  membership_id: string
-  start_date: string
-  end_date: string
-  status: 'active' | 'expired' | 'cancelled'
-  created_at: string
-  member?: Member
-  membership?: Membership
 }
